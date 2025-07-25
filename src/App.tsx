@@ -15,24 +15,27 @@ function App() {
         }`}
       >
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-xl w-full mx-auto p-8 flex items-center justify-between">
-            <h1 className="text-white text-4xl font-bold tracking-[1rem]">
-              TODO
-            </h1>
-            <button onClick={() => setDarkMode(!darkMode)}>
-              {darkMode ? (
-                <img src={sun} alt="Toggle Light Mode" className="w-7" />
-              ) : (
-                <img src={moon} alt="Toggle Dark Mode" className="w-7" />
-              )}
-            </button>
+          <div className="max-w-xl w-full mx-auto p-8 ">
+            <div className="flex items-center justify-between">
+              <h1 className="text-white text-4xl font-bold tracking-[1rem]">
+                TODO
+              </h1>
+              <button onClick={() => setDarkMode(!darkMode)}>
+                {darkMode ? (
+                  <img src={sun} alt="Toggle Light Mode" className="w-7" />
+                ) : (
+                  <img src={moon} alt="Toggle Dark Mode" className="w-7" />
+                )}
+              </button>
+            </div>
+            <div className="relative bg-gray-800 rounded-lg">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 size-5 rounded-full border border-white/50"></div>
+              <input type="text" placeholder="Create a new todo..." className="w-full pl-12 py-4 rounded-lg"/>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex-1 bg-white dark:bg-gray-800">
-
-      </div>
-      
+      <div className="flex-1 bg-white dark:bg-gray-800"></div>
     </div>
   );
 }
