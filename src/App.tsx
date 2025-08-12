@@ -1,18 +1,69 @@
-import moon from "./assets/icon-moon.svg";
-import sun from "./assets/icon-sun.svg";
 import { useState } from "react";
-import iconCross from "./assets/icon-cross.svg";
-import iconCheck from "./assets/icon-check.svg";
+import {
+  DndContext,
+  closestCenter,
+} from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import Header from "./components/Header";
+import TodoInput from "./components/TodoInput";
+import TodoList from "./components/TodoList";
+import TodoFilter from "./components/TodoFilter";
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
+  const [todos, setTodos] = useState<{ id: number; text: string; completed: boolean }[]>([]);
+  const [input, setInput] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return true;
+  });
+
+  const addTodo = () => {
+    const text = input.trim();
+    if (!text) return;
+    setTodos((prevTodos) => [
+      ...prevTodos,
+      { id: Date.now(), text, completed: false },
+    ]);
+    setInput("");
+  };
+
+  const toggleTodo = (id: number) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.completed));
+  };
+
+  // dnd-kit: handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      const oldIndex = todos.findIndex((todo) => todo.id === active.id);
+      const newIndex = todos.findIndex((todo) => todo.id === over?.id);
+      setTodos((todos) => arrayMove(todos, oldIndex, newIndex));
+    }
+  };
 
   return (
-    <div
-      className={`min-h-screen bg-gray-100 dark:bg-gray-900 ${
-        darkMode ? "dark" : ""
-      }`}
-    >
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 ${darkMode ? "dark" : ""}`}>
       {/* bg image */}
       <div
         className={`fixed top-0 left-0 w-full h-[300px] bg-cover bg-center bg-no-repeat ${
@@ -22,96 +73,27 @@ function App() {
         }`}
       />
       <div className="relative max-w-xl w-full mx-auto p-8 pt-16">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-white text-4xl font-bold tracking-[1rem] ">
-            TODO
-          </h1>
-          <button onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? (
-              <img src={sun} alt="Toggle Light Mode" className="w-7" />
-            ) : (
-              <img src={moon} alt="Toggle Dark Mode" className="w-7" />
-            )}
-          </button>
-        </div>
-        <div className="relative bg-gray-800 rounded-lg">
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 size-5 rounded-full border border-gray-400"></div>
-          <input
-            type="text"
-            placeholder="Create a new todo..."
-            className="w-full pl-12 py-4 rounded-lg text-white"
-          />
-        </div>
-        {/* todo list */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between bg-gray-800 p-4 border-b border-gray-700 first:rounded-t-xl">
-            <div className="flex items-center">
-              <div className="relative mr-4 flex items-center">
-                <input
-                  type="checkbox"
-                  className="size-5 rounded-full border border-gray-400 bg-transparent appearance-none checked:bg-gradient-to-br checked:from-blue-400 checked:to-purple-500 checked:border-transparent checked:border-0 cursor-pointer peer"
-                />
-                <img
-                  src={iconCheck}
-                  alt="Check"
-                  className="absolute inset-0 w-2.5 h-2.5 m-auto opacity-0 peer-checked:opacity-100 pointer-events-none"
-                />
-              </div>
-              <span className="text-white">Sample Todo Item</span>
-            </div>
-            <button className="text-gray-400 hover:text-white">
-              <img
-                src={iconCross}
-                alt="Delete Todo"
-                className="w-5 cursor-pointer"
-              />
-            </button>
-          </div>
-          <div className="flex items-center justify-between bg-gray-800 p-4 border-b border-gray-700 first:rounded-t-xl">
-            <div className="flex items-center">
-              <div className="relative mr-4 flex items-center">
-                <input
-                  type="checkbox"
-                  className="size-5 rounded-full border border-gray-400 bg-transparent appearance-none checked:bg-gradient-to-br checked:from-blue-400 checked:to-purple-500 checked:border-transparent checked:border-0 cursor-pointer peer"
-                />
-                <img
-                  src={iconCheck}
-                  alt="Check"
-                  className="absolute inset-0 w-2.5 h-2.5 m-auto opacity-0 peer-checked:opacity-100 pointer-events-none"
-                />
-              </div>
-              <span className="text-white">Sample Todo Item</span>
-            </div>
-            <button className="text-gray-400 hover:text-white">
-              <img
-                src={iconCross}
-                alt="Delete Todo"
-                className="w-5 cursor-pointer"
-              />
-            </button>
-          </div>
-        </div>
-
-        {/* filter */}
-        <div className="flex items-center justify-center md:justify-between text-gray-400 bg-gray-800 p-4 rounded-b-xl">
-          <div className="hidden md:block">1 item left</div>
-          <div className="space-x-4">
-            <button className="text-gray-400 hover:text-white cursor-pointer">
-              All
-            </button>
-            <button className="text-gray-400 hover:text-white cursor-pointer">
-              Active
-            </button>
-            <button className="text-gray-400 hover:text-white cursor-pointer">
-              Completed
-            </button>
-          </div>
-          <div className="hidden md:block">
-            <button className="text-gray-400 hover:text-white cursor-pointer">
-              Clear Completed
-            </button>
-          </div>
-        </div>
+        <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+        <TodoInput
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onAdd={addTodo}
+        />
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={todos.map((todo) => todo.id)} strategy={verticalListSortingStrategy}>
+            <TodoList
+              todos={filteredTodos}
+              onToggle={toggleTodo}
+              onDelete={deleteTodo}
+            />
+          </SortableContext>
+        </DndContext>
+        <TodoFilter
+          left={todos.filter((t) => !t.completed).length}
+          filter={filter}
+          setFilter={setFilter}
+          clearCompleted={clearCompleted}
+        />
       </div>
     </div>
   );
