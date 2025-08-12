@@ -14,9 +14,15 @@ import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
 import TodoFilter from "./components/TodoFilter";
 
+type TodoType = {
+  id: number;
+  text: string;
+  completed: boolean;
+};
+
 function App() {
   const [darkMode, setDarkMode] = useState(true);
-  const [todos, setTodos] = useState<{ id: number; text: string; completed: boolean }[]>([]);
+  const [todos, setTodos] = useState<TodoType[]>([]);
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState("all");
 
