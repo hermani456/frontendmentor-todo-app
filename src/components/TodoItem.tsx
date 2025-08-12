@@ -37,12 +37,16 @@ export default function TodoItem({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className={`flex items-center justify-between bg-gray-800 p-4 border-b border-gray-700 ${
-        roundedTop ? "rounded-t-xl" : ""
-      }`}
+      className={`flex items-center justify-between bg-gray-800 p-4 border-b border-gray-700 ${roundedTop ? "rounded-t-xl" : ""}`}
     >
       <div className="flex items-center">
+        <span
+          {...listeners}
+          className="mr-2 cursor-grab text-gray-400 hover:text-white select-none"
+          aria-label="Drag"
+        >
+          &#8942;
+        </span>
         <div className="relative mr-4 flex items-center">
           <input
             type="checkbox"
@@ -56,11 +60,7 @@ export default function TodoItem({
             className="absolute inset-0 w-2.5 h-2.5 m-auto opacity-0 peer-checked:opacity-100 pointer-events-none"
           />
         </div>
-        <span
-          className={`text-white ${
-            todo.completed ? "line-through opacity-50" : ""
-          }`}
-        >
+        <span className={`text-white ${todo.completed ? "line-through opacity-50" : ""}`}>
           {todo.text}
         </span>
       </div>
